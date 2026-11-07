@@ -15,6 +15,28 @@ def test_chunking_and_pruning():
 
 
 @pytest.mark.skipif(importlib.util.find_spec('ImageReward') is None,reason='evaluation extra not installed')
+def test_reward_tokenizer_special_tokens(monkeypatch, tmp_path):
+    from transformers import BertTokenizer
+    from eval.reward_compat import import_image_reward
+
+    vocab = tmp_path / 'vocab.txt'
+    vocab.write_text('[PAD]\n[UNK]\n[CLS]\n[SEP]\n[MASK]\nhello\n')
+    tokenizer = BertTokenizer(vocab_file=str(vocab))
+    original_size = len(tokenizer)
+    monkeypatch.setattr(BertTokenizer, 'from_pretrained', lambda *a, **kw: tokenizer)
+    import_image_reward()
+    from ImageReward.models.BLIP import blip, blip_pretrain
+
+    assert blip.init_tokenizer is blip_pretrain.init_tokenizer
+    result = blip_pretrain.init_tokenizer()
+    assert result.bos_token == '[DEC]'
+    assert result.enc_token_id == result.convert_tokens_to_ids('[ENC]')
+    assert result.enc_token_id != result.unk_token_id
+    assert result.enc_token_id != result.bos_token_id
+    assert len(result) == original_size + 2
+
+
+@pytest.mark.skipif(importlib.util.find_spec('ImageReward') is None,reason='evaluation extra not installed')
 def test_legacy_bert_cross_attention_cpu():
     import transformers.modeling_utils as modeling
     original=hasattr(modeling,'apply_chunking_to_forward')
