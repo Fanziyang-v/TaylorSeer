@@ -11,8 +11,8 @@ Here, We provide a highly readable and easy-to-use implementation of TaylorSeer,
 ## 📋TODO List
 
 - [x] Initialize this project.
-- [ ] Implement core algorithm of TaylorSeer.
-- [ ] Support DiT and FLUX.1-dev models.
+- [x] Implement core algorithm of TaylorSeer.
+- [x] Support DiT and FLUX.1-dev models.
 - [ ] Support evaluation.
 
 
@@ -31,7 +31,27 @@ cd TaylorSeer
 
 ```
 uv sync
+
+## 🔌Adapters
+
 ```
+
+Currently, we support 2 adapters: *DiT* and *FLUX*, with each adapter targets one model family. Inference demos can be found in `playground/`. Here is an running example:
+
+```
+python playground/flux.py \
+    --prompt "A cat holding a sign that says hello world" \
+    --num-inference-steps 50 \
+    --guidance-scale 3.5 \
+    --enable-taylorseer \
+    --order 2 \
+    --interval 4 \
+    --warmup_steps 3 \
+    --height 1024 \
+    --width 1024 \
+    --output-path flux_ts.png
+```
+
 
 ## 👏Acknowledgement
 
