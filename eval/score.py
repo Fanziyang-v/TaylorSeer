@@ -12,7 +12,8 @@ REWARD_MODEL = "ImageReward-v1.0"
 
 class Metrics:
     def __init__(self, device, clip_model=CLIP_MODEL, reward_model=REWARD_MODEL):
-        import ImageReward as RM
+        from .reward_compat import import_image_reward
+        RM = import_image_reward()
         from torchmetrics.image import LearnedPerceptualImagePatchSimilarity
         from torchmetrics.multimodal import CLIPScore
 

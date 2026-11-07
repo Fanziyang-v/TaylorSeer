@@ -10,9 +10,10 @@ dependencies = ["diffusers>=0.42.1", "torch>=2.14.1", "torchvision>=0.29.1"]
 [project.optional-dependencies]
 evaluation = [
     "torchmetrics>=1.6,<2",
-    "transformers>=4.44,<4.46",
+    "transformers>=5,<6",
     "setuptools<81",
     "image-reward==1.5",
+    "openai-clip>=1.0.1",
     "lpips>=0.1.4",
     "Pillow>=10",
 ]

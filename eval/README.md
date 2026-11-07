@@ -6,8 +6,9 @@ Default: one image per prompt, 200 images per method. Generation and scoring
 use independent replicas and deterministic data shards, without DDP wrapping.
 
 Install the optional `evaluation` dependencies (`pip install -e '.[evaluation]'`,
-or `uv sync --extra evaluation`). ImageReward's legacy dependencies require
-Transformers 4.44–4.45 and setuptools below 81. Metric weights download on first
+or `uv sync --extra evaluation --locked`). ImageReward's legacy dependencies require
+Transformers 5 with the local `reward_compat` bridge and setuptools below 81.
+The bridge is limited to ImageReward's vendored BERT; FLUX is not patched. Metric weights download on first
 use; pre-cache them before a multi-process run. In an offline environment,
 `--clip-model` and `--reward-model` can specify compatible local weights.
 
@@ -61,3 +62,22 @@ Heavy metric weights are not needed by unit tests. The optional real SSIM/PSNR
 test runs when torchmetrics is installed. Real FLUX generation and downloaded
 CLIP/LPIPS/ImageReward smoke tests require a configured inference environment.
 GenEval, CompBench and human-evaluation tools are outside this workflow.
+
+
+## CPU-only preparation
+
+`uv sync --extra evaluation --locked` works without a GPU or NVIDIA driver.
+Linux keeps the project's CUDA-enabled PyTorch wheels so the same lockfile
+can be reused on GPU nodes. Their CPU operations are available on CPU nodes;
+no CUDA toolkit compilation is required. This command installs dependencies,
+not model weights.
+
+```bash
+uv sync --extra evaluation --locked
+uv pip check
+uv run --extra evaluation --locked python -m pytest tests -q
+```
+
+Generation still requires a GPU. Scoring can run on CPU using `--device cpu`.
+The offline tests exercise ImageReward's small BERT cross-attention forward,
+SSIM/PSNR and FLUX import/adapter behavior without downloading model weights.
