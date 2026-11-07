@@ -13,7 +13,8 @@ Here, We provide a highly readable and easy-to-use implementation of TaylorSeer,
 - [x] Initialize this project.
 - [x] Implement core algorithm of TaylorSeer.
 - [x] Support DiT and FLUX.1-dev models.
-- [ ] Support evaluation.
+- [x] Support evaluation.
+- [ ] Support more generative models (e.g., Minimax-H3, Qwen-Image)
 
 
 ## 📦Installation
