@@ -1,0 +1,53 @@
+[project]
+name = "TaylorSeer"
+version = "v0.1.0"
+description = "From Reusing to Forecasting: Accelerating Diffusion Models with TaylorSeers"
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.12"
+authors = [{ name = "Ziyang Fan", email = "bugkiller.fzy@gmail.com" }]
+dependencies = [
+    "diffusers>=0.42.1",
+    "torch>=2.14.1",
+    "torchvision>=0.29.1",
+]
+[build-system]
+requires = ["setuptools>=80.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.uv.extra-build-dependencies]
+flash-attn = ["torch"]
+
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cpu", marker = "sys_platform == 'darwin'" },
+    { index = "pytorch-cu130", marker = "sys_platform == 'linux'" },
+]
+torchvision = [
+    { index = "pytorch-cpu", marker = "sys_platform == 'darwin'" },
+    { index = "pytorch-cu130", marker = "sys_platform == 'linux'" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu130"
+url = "https://download.pytorch.org/whl/cu130"
+explicit = true
+
+[dependency-groups]
+dev = ["pytest>=9.1.1"]
+
+[project.urls]
+"Homepage" = "https://taylorseer.github.io"
+"Repository" = "https://github.com/Fanziyang-v/TaylorSeer"
+"Bug Tracker" = "https://github.com/Fanziyang-v/TaylorSeer/issues"
