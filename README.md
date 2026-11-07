@@ -93,6 +93,12 @@ The table summarizes completed experiments in `outputs/drawbench/`. Latency is a
 
 ImageReward and CLIPScore measure prompt alignment, while PSNR, SSIM, and LPIPS compare TaylorSeer images with the baseline. Higher is better for all quality metrics except LPIPS. See [eval/README.md](eval/README.md) for evaluation commands and metric details.
 
+## 🎨Visualizations
+
+![Qualitative examples on FLUX.1-dev](assets/visualizations.png)
+
+Qualitative comparisons between the baseline and TaylorSeer ($\mathcal{N}=3,4,5,6$, $O=2$) on FLUX.1-dev. Click the image to view the original PDF.
+
 ## 👏Acknowledgement
 
 This project is built upon the official implementation of [TaylorSeer](https://github.com/Shenyi-Z/TaylorSeer) and [diffusers](https://github.com/huggingface/diffusers). Thanks for their excellent work!
