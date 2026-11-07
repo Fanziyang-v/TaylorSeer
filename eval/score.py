@@ -16,9 +16,11 @@ class Metrics:
         RM = import_image_reward()
         from torchmetrics.image import LearnedPerceptualImagePatchSimilarity
         from torchmetrics.multimodal import CLIPScore
+        from .clip_compat import adapt_clip_features
 
         self.device = device
         self.clip = CLIPScore(model_name_or_path=clip_model).to(device).eval()
+        adapt_clip_features(self.clip.model)
         self.reward = RM.load(reward_model, device=device).eval()
         self.lpips = (
             LearnedPerceptualImagePatchSimilarity(net_type="alex", normalize=True)

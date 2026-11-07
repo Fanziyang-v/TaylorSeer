@@ -57,6 +57,16 @@ def get_head_mask(self, mask, layers, is_attention_chunked=False):
     return mask.unsqueeze(-1) if is_attention_chunked else mask
 
 
+def init_reward_tokenizer():
+    from transformers import BertTokenizer
+
+    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+    tokenizer.add_special_tokens({'bos_token': '[DEC]'})
+    tokenizer.add_special_tokens({'additional_special_tokens': ['[ENC]']})
+    tokenizer.enc_token_id = tokenizer.convert_tokens_to_ids('[ENC]')
+    return tokenizer
+
+
 def import_image_reward():
     import transformers.modeling_utils as modeling
     # ImageReward imports these removed names directly at module import time.
@@ -77,4 +87,8 @@ def import_image_reward():
     # The reward encoder has no LM head or tied output weights. Keep the
     # original BERT initialization rather than Transformers 5 post_init logic.
     BertModel.init_weights = lambda self: self.apply(self._init_weights)
+    from ImageReward.models.BLIP import blip, blip_pretrain
+    # blip_pretrain imports the function by value, so update both references.
+    blip.init_tokenizer = init_reward_tokenizer
+    blip_pretrain.init_tokenizer = init_reward_tokenizer
     return reward
