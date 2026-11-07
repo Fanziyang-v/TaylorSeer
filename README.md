@@ -31,10 +31,35 @@ cd TaylorSeer
 
 ```
 uv sync
+```
+
+## 🚀Quickstart
+
+The current implementation of TaylorSeer is easy to use and works out of the box. Just wrap the pipeline's cacheable submodules of `diffusers` via an adapter, then monkey-patch them through a `CacheManager` within a `with` block:
+
+```python
+from diffusers import FluxPipeline
+from taylorseer import CacheManager, FluxAdapter, TaylorSeerConfig
+
+pipe = FluxPipeline.from_pretrained(
+    "black-forest-labs/FLUX.1-dev",
+    torch_dtype=torch.bfloat16
+).to("cuda")
+
+config = TaylorSeerConfig(order=2, interval=4, warmup_steps=1)
+manager = CacheManager(config)
+
+with FluxAdapter().patch(pipe, manager):
+    image = pipe("A cat holding a sign that says hello world").images[0]
+```
+
+- `order`: max order of the Taylor expansion used to predict skipped steps (`0` = naive feature reuse).
+- `interval`: number of steps between two full-compute (activation) steps.
+- `warmup_steps`: number of steps at the start of denoising that are always full-compute.
+
+Exiting the `with` block restores the pipeline's original `forward` methods, so the same `pipe` can be reused with or without acceleration.
 
 ## 🔌Adapters
-
-```
 
 Currently, we support 2 adapters: *DiT* and *FLUX*, with each adapter targets one model family. Inference demos can be found in `playground/`. Here is an running example:
 
@@ -52,6 +77,21 @@ python playground/flux.py \
     --output-path flux_ts.png
 ```
 
+## 📊Evaluation
+
+We evaluate **FLUX.1-dev** with and without TaylorSeer on [DrawBench](eval/drawbench/drawbench.jsonl), using 200 prompts and one image per prompt. All runs use the same seeds, 50 inference steps, 1024 × 1024 resolution, and guidance scale 3.5. TaylorSeer uses 3 warmup steps; $\mathcal{N}$ denotes the full-compute interval and $O$ the Taylor expansion order.
+
+The table summarizes completed experiments in `outputs/drawbench/`. Latency is averaged per image, and speedup is measured relative to the baseline.
+
+| Method | Latency (s) ↓ | Speedup ↑ | ImageReward ↑ | CLIPScore ↑ | PSNR (dB) ↑ | SSIM ↑ | LPIPS ↓ |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| FLUX.1-dev | 28.75 | 1.00× | 1.0178 | 32.148 | — | — | — |
+| TaylorSeer ($\mathcal{N}=4$, $O=2$) | 9.45 | 3.04× | 1.0107 | 32.168 | 18.275 | 0.7425 | 0.2864 |
+| TaylorSeer ($\mathcal{N}=5$, $O=2$) | 8.36 | 3.44× | 0.9903 | 32.048 | 17.166 | 0.7115 | 0.3399 |
+| TaylorSeer ($\mathcal{N}=6$, $O=1$) | 7.03 | 4.09× | 0.9375 | 32.018 | 15.837 | 0.6658 | 0.4005 |
+| TaylorSeer ($\mathcal{N}=6$, $O=2$) | 8.95 | 3.21× | 0.9793 | 32.182 | 16.222 | 0.6668 | 0.4007 |
+
+ImageReward and CLIPScore measure prompt alignment, while PSNR, SSIM, and LPIPS compare TaylorSeer images with the baseline. Higher is better for all quality metrics except LPIPS. See [eval/README.md](eval/README.md) for evaluation commands and metric details.
 
 ## 👏Acknowledgement
 
