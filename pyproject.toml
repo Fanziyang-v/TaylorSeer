@@ -6,11 +6,17 @@ readme = "README.md"
 license = { text = "Apache-2.0" }
 requires-python = ">=3.12"
 authors = [{ name = "Ziyang Fan", email = "bugkiller.fzy@gmail.com" }]
-dependencies = [
-    "diffusers>=0.42.1",
-    "torch>=2.14.1",
-    "torchvision>=0.29.1",
+dependencies = ["diffusers>=0.42.1", "torch>=2.14.1", "torchvision>=0.29.1"]
+[project.optional-dependencies]
+evaluation = [
+    "torchmetrics>=1.6,<2",
+    "transformers>=4.44,<4.46",
+    "setuptools<81",
+    "image-reward==1.5",
+    "lpips>=0.1.4",
+    "Pillow>=10",
 ]
+
 [build-system]
 requires = ["setuptools>=80.0", "wheel"]
 build-backend = "setuptools.build_meta"
